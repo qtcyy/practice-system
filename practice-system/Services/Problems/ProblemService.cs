@@ -76,21 +76,9 @@ namespace practice_system.Services.Problems
                 .Where(ua => problemIdSet.Contains(ua.ProblemId) && ua.UserId == userId)
                 .ToDictionaryAsync(ua => ua.ProblemId, ua => ua.Status, ct);
 
-            var result = problems.Select(p => new ProblemDto
-            {
-                Id = p.Id,
-                Content = p.Content,
-                Type = p.Type,
-                SetId = p.SetId,
-                Order = p.Order,
-                CreateAt = p.CreateAt,
-                UpdateAt = p.UpdateAt,
-                CreateBy = p.CreateBy,
-                UpdateBy = p.UpdateBy,
-                Version = p.Version,
-                IsDeleted = p.IsDeleted,
-                Status = ansStatusDict.GetValueOrDefault(p.Id, ProblemStatus.Unattempted)
-            }).ToList();
+            var result = problems
+                .Select(p => new ProblemDto(p, ansStatusDict.GetValueOrDefault(p.Id, ProblemStatus.Unattempted)))
+                .ToList();
 
             return result;
         }
@@ -148,6 +136,33 @@ namespace practice_system.Services.Problems
                 dto.SelectedResultId = selectedResultIds;
             }
             return dto;
+        }
+
+        // 获取非正确作答的题目列表
+        public async Task<List<ProblemDto>> GetIncorrectProblems(Guid userId, Guid problemSetId, CancellationToken ct)
+        {
+            var problemSet = await _db.ProblemSets
+                .FirstOrDefaultAsync(ps => ps.Id == problemSetId, ct)
+                ?? throw new BusinessException("Problem set not found", 404);
+            if (problemSet.UserId != userId) throw new BusinessException("Unauthorized access to problem set", 400);
+
+            var incorrectProblems = await _db.Problems
+                .Join(
+                    _db.UserAnswers,
+                    p => p.Id,
+                    ua => ua.ProblemId,
+                    (p, ua) => new { p, ua }
+                )
+                .Where(obj => obj.p.SetId == problemSetId
+                    && obj.ua.UserId == userId
+                    && (obj.ua.Status == ProblemStatus.Incorrect
+                        || obj.ua.Status == ProblemStatus.PartiallyCorrect))
+                .OrderBy(obj => obj.p.Order)
+                .ToListAsync(ct);
+
+            return incorrectProblems
+                .Select(obj => new ProblemDto(obj.p, obj.ua.Status))
+                .ToList();
         }
     }
 }

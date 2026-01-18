@@ -10,6 +10,24 @@ namespace practice_system.Dtos
     public class ProblemDto : Problem
     {
         public ProblemStatus? Status { get; set; }
+
+        public ProblemDto() { }
+
+        public ProblemDto(Problem p, ProblemStatus? status = null)
+        {
+            Id = p.Id;
+            Content = p.Content;
+            Type = p.Type;
+            SetId = p.SetId;
+            Order = p.Order;
+            CreateAt = p.CreateAt;
+            UpdateAt = p.UpdateAt;
+            CreateBy = p.CreateBy;
+            UpdateBy = p.UpdateBy;
+            Version = p.Version;
+            IsDeleted = p.IsDeleted;
+            Status = status;
+        }
     }
     public class ProblemDelailDto : Problem
     {
@@ -23,4 +41,6 @@ namespace practice_system.Dtos
     public record GetProblemsResp(string Message, List<ProblemDto> Problems);
 
     public record GetProblemDetailResp(string Message, ProblemDelailDto ProblemDetail);
+
+    public record GetIncorrectProblemsResp(string Message, List<ProblemDto> Problems);
 }
