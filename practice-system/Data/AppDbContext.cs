@@ -1,11 +1,16 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using practice_system.Models;
+using practice_system.Models.Users;
 
 namespace practice_system.Data;
 
 public class AppDbContext : DbContext
 {
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
