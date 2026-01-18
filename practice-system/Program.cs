@@ -9,6 +9,7 @@ using practice_system.Services.Common;
 using Microsoft.OpenApi.Models;
 using practice_system.Middlewares;
 using practice_system.Services.Users;
+using practice_system.Services.Problems;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add Bean
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProblemService, ProblemService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
