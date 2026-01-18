@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using practice_system.Dtos;
+using practice_system.Services.Users;
 
 namespace practice_system.Controllers
 {
@@ -7,11 +8,25 @@ namespace practice_system.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+        private readonly IUserService _user;
+
+        public UserController(IUserService user)
+        {
+            _user = user;
+        }
+
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterReq req)
+        public async Task<IActionResult> Register([FromBody] RegisterReq req, CancellationToken ct)
         {
             // Registration logic here
-            return Ok("User registered successfully.");
+            var username = req.Username.Trim();
+            if (string.IsNullOrEmpty(username) || req.Password.Length < 6)
+            {
+                return BadRequest("Username and password cannot be empty.");
+            }
+            var user = await _user.Register(username, req.Password, ct);
+
+            return Ok(new RegisterResp("User registered successfully.", user.Id, user.Username));
         }
 
         [HttpPost("login")]
