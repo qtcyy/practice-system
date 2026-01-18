@@ -32,5 +32,19 @@ namespace practice_system.Controllers
 
             return Ok(resp);
         }
+
+        [HttpGet("get-problems/{problemSetId}")]
+        public async Task<IActionResult> GetProblems(Guid problemSetId, CancellationToken ct)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized();
+            }
+            var problems = await _problemService.GetProblems(userId, problemSetId, ct);
+            var resp = new GetProblemsResp("success", problems);
+
+            return Ok(resp);
+        }
     }
 }

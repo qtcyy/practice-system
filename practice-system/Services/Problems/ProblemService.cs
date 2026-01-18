@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using practice_system.Data;
 using practice_system.Dtos;
+using practice_system.Exceptions;
 using practice_system.Models.Problems;
 
 namespace practice_system.Services.Problems
@@ -17,6 +18,7 @@ namespace practice_system.Services.Problems
         public async Task<List<ProblemSetDto>> GetProblemSet(Guid userId, CancellationToken ct)
         {
             var problemSets = await _db.ProblemSets
+                .Where(ps => ps.UserId == userId)
                 .OrderByDescending(ps => ps.UpdateAt)
                 .ToListAsync(ct);
 
@@ -47,6 +49,42 @@ namespace practice_system.Services.Problems
                 IsDeleted = ps.IsDeleted,
                 TotalProblems = problemCounts.GetValueOrDefault(ps.Id, 0),
                 AttemptedProblems = attemptedCounts.GetValueOrDefault(ps.Id, 0)
+            }).ToList();
+
+            return result;
+        }
+
+        public async Task<List<ProblemDto>> GetProblems(Guid userId, Guid problemSetId, CancellationToken ct)
+        {
+            var problemSet = await _db.ProblemSets
+                .FirstOrDefaultAsync(ps => ps.Id == problemSetId, ct)
+                ?? throw new BusinessException("Problem set not found", 404);
+            if (problemSet.UserId != userId) throw new BusinessException("Unauthorized access to problem set", 400);
+
+            var problems = await _db.Problems
+                .Where(p => p.SetId == problemSetId)
+                .OrderBy(p => p.Order)
+                .ToListAsync(ct);
+
+            var problemIdSet = problems.Select(p => p.Id).ToHashSet();
+            var ansStatusDict = await _db.UserAnswers
+                .Where(ua => problemIdSet.Contains(ua.ProblemId) && ua.UserId == userId)
+                .ToDictionaryAsync(ua => ua.ProblemId, ua => ua.Status, ct);
+
+            var result = problems.Select(p => new ProblemDto
+            {
+                Id = p.Id,
+                Content = p.Content,
+                Type = p.Type,
+                SetId = p.SetId,
+                Order = p.Order,
+                CreateAt = p.CreateAt,
+                UpdateAt = p.UpdateAt,
+                CreateBy = p.CreateBy,
+                UpdateBy = p.UpdateBy,
+                Version = p.Version,
+                IsDeleted = p.IsDeleted,
+                Status = ansStatusDict.GetValueOrDefault(p.Id, ProblemStatus.Unattempted)
             }).ToList();
 
             return result;
