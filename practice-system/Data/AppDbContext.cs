@@ -44,6 +44,19 @@ public class AppDbContext : DbContext
             .HasIndex(ur => new { ur.UserId, ur.RoleId })
             .IsUnique();
 
+        // Problem 相关表索引
+        modelBuilder.Entity<Problem>()
+            .HasIndex(p => new { p.SetId, p.Order });
+        modelBuilder.Entity<ProblemSet>()
+            .HasIndex(ps => ps.UserId);
+        modelBuilder.Entity<ProblemResult>()
+            .HasIndex(pr => new { pr.ProblemId, pr.Order });
+        modelBuilder.Entity<UserAnswer>()
+            .HasIndex(ua => new { ua.UserId, ua.ProblemId });
+        modelBuilder.Entity<UserAnswerSelection>()
+            .HasIndex(uas => uas.UserAnswerId);
+
+
         // 获取所有继承 BaseModel 的实体类型
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
