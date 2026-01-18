@@ -2,11 +2,11 @@
 
 namespace practice_system.Models.Users
 {
-    public class UserRole
+    public class UserRole : BaseModel
     {
         [Required]
         public Guid UserId { get; set; }
         [Required]
-        public string RoleId { get; set; }
+        public Guid RoleId { get; set; }
     }
 }

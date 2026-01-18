@@ -30,10 +30,17 @@ namespace practice_system.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginReq req)
+        public async Task<IActionResult> Login([FromBody] LoginReq req, CancellationToken ct)
         {
             // Login logic here
-            return Ok("User logged in successfully.");
+            var username = req.Username.Trim();
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(req.Password))
+            {
+                return BadRequest("Username and password cannot be empty.");
+            }
+            var resp = await _user.Login(username, req.Password, ct);
+
+            return Ok(resp);
         }
     }
 }

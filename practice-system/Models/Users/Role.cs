@@ -2,7 +2,7 @@
 
 namespace practice_system.Models.Users
 {
-    public class Role
+    public class Role : BaseModel
     {
         [Required]
         public string RoleName { get; set; }
