@@ -11,10 +11,10 @@ namespace practice_system.Services.Users
     public class UserService : IUserService
     {
         private readonly AppDbContext _db;
-        private readonly PasswordHasher<User> _hasher;
+        private readonly IPasswordHasher<User> _hasher;
         private readonly JwtCreateService _jwt;
 
-        public UserService(AppDbContext db, PasswordHasher<User> hasher, JwtCreateService jwt)
+        public UserService(AppDbContext db, IPasswordHasher<User> hasher, JwtCreateService jwt)
         {
             _db = db;
             _hasher = hasher;

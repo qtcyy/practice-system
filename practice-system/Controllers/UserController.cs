@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using practice_system.Dtos;
 using practice_system.Services.Users;
 
@@ -41,6 +42,13 @@ namespace practice_system.Controllers
             var resp = await _user.Login(username, req.Password, ct);
 
             return Ok(resp);
+        }
+
+        [HttpGet("ping")]
+        [Authorize(Roles = "ADMIN")]
+        public IActionResult Ping()
+        {
+            return Ok("Pong");
         }
     }
 }

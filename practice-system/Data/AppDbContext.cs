@@ -21,6 +21,16 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // User 表 Username 唯一索引
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+        modelBuilder.Entity<Role>()
+            .HasIndex(r => r.RoleName);
+        modelBuilder.Entity<UserRole>()
+            .HasIndex(ur => new { ur.UserId, ur.RoleId })
+            .IsUnique();
+
         // 获取所有继承 BaseModel 的实体类型
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
