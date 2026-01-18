@@ -8,5 +8,7 @@ namespace practice_system.Services.Problems
         Task<List<ProblemSetDto>> GetProblemSet(Guid userId, CancellationToken ct);
 
         Task<List<ProblemDto>> GetProblems(Guid userId, Guid problemSetId, CancellationToken ct);
+
+        Task<ProblemDelailDto> GetProblemDetail(Guid userId, Guid problemId, CancellationToken ct);
     }
 }

@@ -15,6 +15,7 @@ namespace practice_system.Services.Problems
             _db = db;
         }
 
+        // 获取题目集列表及每个题目集的题目数量和已作答题目数量
         public async Task<List<ProblemSetDto>> GetProblemSet(Guid userId, CancellationToken ct)
         {
             var problemSets = await _db.ProblemSets
@@ -22,8 +23,11 @@ namespace practice_system.Services.Problems
                 .OrderByDescending(ps => ps.UpdateAt)
                 .ToListAsync(ct);
 
+            var setIds = problemSets.Select(ps => ps.Id).ToHashSet();
+
             // 获取每个题目集的题目数量
             var problemCounts = await _db.Problems
+                .Where(p => setIds.Contains(p.SetId))
                 .GroupBy(p => p.SetId)
                 .Select(g => new { SetId = g.Key, Count = g.LongCount() })
                 .ToDictionaryAsync(x => x.SetId, x => x.Count, ct);
@@ -54,6 +58,7 @@ namespace practice_system.Services.Problems
             return result;
         }
 
+        // 获取指定题目集下的题目列表及每个题目的作答状态
         public async Task<List<ProblemDto>> GetProblems(Guid userId, Guid problemSetId, CancellationToken ct)
         {
             var problemSet = await _db.ProblemSets
@@ -88,6 +93,61 @@ namespace practice_system.Services.Problems
             }).ToList();
 
             return result;
+        }
+
+        // 获取题目详情，包括题目内容、选项、用户作答等信息
+        public async Task<ProblemDelailDto> GetProblemDetail(Guid userId, Guid problemId, CancellationToken ct)
+        {
+            var obj = await _db.Problems
+                .Where(p => p.Id == problemId)
+                .Join(
+                    _db.ProblemSets,
+                    p => p.SetId,
+                    ps => ps.Id,
+                    (p, ps) => new { ps.UserId, p }
+                ).FirstOrDefaultAsync(ct)
+                ?? throw new BusinessException("Problem not found", 404);
+            if (obj.UserId != userId)
+                throw new BusinessException("Unauthorized access to problem", 400);
+
+            var problemResults = await _db.ProblemResults
+                .Where(pr => pr.ProblemId == problemId)
+                .OrderBy(pr => pr.Order)
+                .ToListAsync(ct);
+
+            var userAnswer = await _db.UserAnswers
+                .Where(ua => ua.ProblemId == problemId && ua.UserId == userId)
+                .FirstOrDefaultAsync(ct);
+
+            var dto = new ProblemDelailDto
+            {
+                Id = obj.p.Id,
+                Content = obj.p.Content,
+                Type = obj.p.Type,
+                SetId = obj.p.SetId,
+                Order = obj.p.Order,
+                CreateAt = obj.p.CreateAt,
+                UpdateAt = obj.p.UpdateAt,
+                CreateBy = obj.p.CreateBy,
+                UpdateBy = obj.p.UpdateBy,
+                Version = obj.p.Version,
+                IsDeleted = obj.p.IsDeleted,
+                Results = problemResults,
+                UserAnswer = userAnswer
+            };
+
+            if (obj.p.Type == ProblemType.Essay)
+                return dto;
+
+            if (userAnswer != null)
+            {
+                var selectedResultIds = await _db.UserAnswerSelections
+                    .Where(uas => uas.UserAnswerId == userAnswer.Id)
+                    .Select(uas => uas.ProblemResultId)
+                    .ToListAsync(ct);
+                dto.SelectedResultId = selectedResultIds;
+            }
+            return dto;
         }
     }
 }

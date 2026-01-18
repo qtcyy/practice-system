@@ -46,5 +46,19 @@ namespace practice_system.Controllers
 
             return Ok(resp);
         }
+
+        [HttpGet("get-detail/{problemId}")]
+        public async Task<IActionResult> GetProblemDetail(Guid problemId, CancellationToken ct)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized();
+            }
+            var detail = await _problemService.GetProblemDetail(userId, problemId, ct);
+            var resp = new GetProblemDetailResp("success", detail);
+
+            return Ok(resp);
+        }
     }
 }
