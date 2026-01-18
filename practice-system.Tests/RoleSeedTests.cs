@@ -13,7 +13,7 @@ public class RoleSeedTests
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString))
             .Options;
-        return new AppDbContext(options);
+        return new AppDbContext(options, null!);
     }
 
     [Fact]

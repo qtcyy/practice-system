@@ -1,18 +1,31 @@
 using System.Linq.Expressions;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using practice_system.Models;
+using practice_system.Models.Problems;
 using practice_system.Models.Users;
 
 namespace practice_system.Data;
 
 public class AppDbContext : DbContext
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    public DbSet<ProblemSet> ProblemSets { get; set; }
+    public DbSet<Problem> Problems { get; set; }
+    public DbSet<ProblemResult> ProblemResults { get; set; }
+    public DbSet<UserAnswer> UserAnswers { get; set; }
+    public DbSet<UserAnswerSelection> UserAnswerSelections { get; set; }
+
+    public AppDbContext(
+        DbContextOptions<AppDbContext> options,
+        IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        _httpContextAccessor = httpContextAccessor;
     }
 
     // DbSet properties will be added here as models are created
@@ -68,6 +81,15 @@ public class AppDbContext : DbContext
 
     private void ProcessBaseModelEntities()
     {
+        // 获取当前用户ID
+        Guid? currentUserId = null;
+        var userIdClaim = _httpContextAccessor.HttpContext?.User
+            .FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdClaim, out var parsedUserId))
+        {
+            currentUserId = parsedUserId;
+        }
+
         var entries = ChangeTracker.Entries<BaseModel>();
         var now = DateTimeOffset.UtcNow;
 
@@ -82,13 +104,17 @@ public class AppDbContext : DbContext
                     entry.Entity.UpdateAt = now;
                     entry.Entity.Version = 1;
                     entry.Entity.IsDeleted = false;
+                    entry.Entity.CreateBy = currentUserId;
+                    entry.Entity.UpdateBy = currentUserId;
                     break;
 
                 case EntityState.Modified:
                     entry.Entity.UpdateAt = now;
                     entry.Entity.Version++;
-                    // 防止修改 CreateAt
+                    entry.Entity.UpdateBy = currentUserId;
+                    // 防止修改 CreateAt 和 CreateBy
                     entry.Property(nameof(BaseModel.CreateAt)).IsModified = false;
+                    entry.Property(nameof(BaseModel.CreateBy)).IsModified = false;
                     break;
 
                 case EntityState.Deleted:
@@ -97,6 +123,7 @@ public class AppDbContext : DbContext
                     entry.Entity.IsDeleted = true;
                     entry.Entity.UpdateAt = now;
                     entry.Entity.Version++;
+                    entry.Entity.UpdateBy = currentUserId;
                     break;
             }
         }
