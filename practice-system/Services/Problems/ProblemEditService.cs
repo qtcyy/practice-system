@@ -25,9 +25,15 @@ namespace practice_system.Services.Problems
             {
                 throw new BusinessException("Unauthorized to add problem to this set");
             }
+            var maxOrderProblem = await _db.Problems
+                .Where(p => p.SetId == problemSetId)
+                .OrderByDescending(p => p.Order)
+                .FirstOrDefaultAsync(ct);
+
 
             problem.Id = Guid.NewGuid();
             problem.SetId = problemSetId;
+            problem.Order = maxOrderProblem != null ? maxOrderProblem.Order + 1 : 0;
             await _db.Problems.AddAsync(problem, ct);
 
             var orderedResults = results.Select((r, idx) =>
