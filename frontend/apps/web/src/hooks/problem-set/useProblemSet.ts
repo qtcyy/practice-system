@@ -8,6 +8,8 @@ type ProblemSetType = {
   title: string;
   description?: string;
   userId: string;
+  totalProblems: number;
+  attemptedProblems: number;
   createAt: string;
   updateAt: string;
 };

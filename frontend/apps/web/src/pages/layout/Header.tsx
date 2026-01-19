@@ -31,9 +31,9 @@ const Header = () => {
 
   return (
     <>
-      <header className="h-16 bg-white border-b flex items-center px-4 md:px-6 flex-shrink-0">
+      <header className="h-16 bg-white border-b border-gray-300 flex items-center px-4 md:px-6 flex-shrink-0">
         {/* 左侧区域 */}
-        <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center gap-4 md:gap-8 border-none">
           <h1 className="text-xl font-bold text-blue-600">刷题系统</h1>
           {/* 桌面端导航：大于等于 768px 显示 */}
           <Nav
@@ -57,7 +57,9 @@ const Header = () => {
           >
             <Button theme="borderless">
               <Avatar size="small">{username?.charAt(0) || 'U'}</Avatar>
-              <span className="ml-2 hidden sm:inline">{username || '用户'}</span>
+              <span className="ml-2 hidden sm:inline">
+                {username || '用户'}
+              </span>
             </Button>
           </Dropdown>
 
