@@ -12,6 +12,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@douyinfe/semi-icons": "^2.90.13",
+    "@ngify/http": "^2.0.6",
     "dayjs": "^1.11.19",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",

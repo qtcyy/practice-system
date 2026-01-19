@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@douyinfe/semi-icons':
+        specifier: ^2.90.13
+        version: 2.90.13(react@19.2.3)
+      '@ngify/http':
+        specifier: ^2.0.6
+        version: 2.0.6(rxjs@7.8.2)
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
@@ -78,6 +84,12 @@ importers:
       react-dom:
         specifier: ^19.2.3
         version: 19.2.3(react@19.2.3)
+      react-router-dom:
+        specifier: ^7.12.0
+        version: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      zustand:
+        specifier: ^5.0.10
+        version: 5.0.10(@types/react@19.2.8)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@rsbuild/core':
         specifier: ^1.7.1
@@ -101,11 +113,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/utils:
-    dependencies:
-      '@ngify/http':
-        specifier: ^2.0.6
-        version: 2.0.6(rxjs@7.8.2)
+  packages/utils: {}
 
 packages:
 

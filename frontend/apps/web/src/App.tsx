@@ -1,11 +1,27 @@
+import { useEffect } from 'react';
+import { HttpContextProvider } from '@workspace/utils';
 import './App.css';
+import NiceModal from '@ebay/nice-modal-react';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
+import { routes } from './routes/routes';
+import { AuthInterceptor } from './interceptors';
+import { useAuthStore } from './stores/authStore';
+
+const router = createHashRouter(routes);
 
 const App = () => {
+  const initAuth = useAuthStore((state) => state.initAuth);
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
   return (
-    <div className="flex flex-col gap-2">
-      <h1>Rsbuild with React</h1>
-      <p>Start building amazing things with Rsbuild.</p>
-    </div>
+    <NiceModal.Provider>
+      <HttpContextProvider fnInterceptors={[AuthInterceptor]}>
+        <RouterProvider router={router} />
+      </HttpContextProvider>
+    </NiceModal.Provider>
   );
 };
 
