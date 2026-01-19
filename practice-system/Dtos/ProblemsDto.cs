@@ -43,4 +43,10 @@ namespace practice_system.Dtos
     public record GetProblemDetailResp(string Message, ProblemDelailDto ProblemDetail);
 
     public record GetIncorrectProblemsResp(string Message, List<ProblemDto> Problems);
+
+    public record NewProblemSetReq(string Title);
+    public record NewProblemSetResp(string Message, ProblemSet ProblemSet);
+
+    public record AddProblemReq(Guid ProblemSetId, Problem Problem, List<ProblemResult> Results);
+    public record AddProblemResp(string Message, Problem Problem, List<ProblemResult> Results);
 }

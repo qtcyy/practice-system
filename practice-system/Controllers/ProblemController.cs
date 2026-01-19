@@ -12,10 +12,12 @@ namespace practice_system.Controllers
     public class ProblemController : ControllerBase
     {
         private readonly IProblemService _problemService;
+        private readonly IProblemEditService _problemEditService;
 
-        public ProblemController(IProblemService problemService)
+        public ProblemController(IProblemService problemService, IProblemEditService problemEditService)
         {
             _problemService = problemService;
+            _problemEditService = problemEditService;
         }
 
         [HttpGet("get-set")]
@@ -71,6 +73,37 @@ namespace practice_system.Controllers
             }
             var problems = await _problemService.GetIncorrectProblems(userId, problemSetId, ct);
             var resp = new GetIncorrectProblemsResp("success", problems);
+
+            return Ok(resp);
+        }
+
+        [HttpPost("new-problem-set")]
+        public async Task<IActionResult> NewProblemSet([FromBody] NewProblemSetReq req, CancellationToken ct)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var newSet = await _problemEditService.NewProblemSet(req.Title, userId, ct);
+            var resp = new NewProblemSetResp("success", newSet);
+
+            return Ok(resp);
+        }
+
+        [HttpPost("add-problem")]
+        public async Task<IActionResult> AddProblem([FromBody] AddProblemReq req, CancellationToken ct)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var (problem, results) = await _problemEditService.AddProblem(
+                userId, req.ProblemSetId, req.Problem, req.Results, ct);
+            var resp = new AddProblemResp("success", problem, results);
 
             return Ok(resp);
         }

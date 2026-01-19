@@ -1,4 +1,6 @@
-﻿namespace practice_system.Models.Problems
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace practice_system.Models.Problems
 {
     public enum ProblemType
     {
@@ -19,7 +21,9 @@
     public class Problem : BaseModel
     {
         public string Content { get; set; } = "";
+        [Required]
         public ProblemType Type { get; set; }
+        [Required]
         public Guid SetId { get; set; }
         public long Order { get; set; }
     }

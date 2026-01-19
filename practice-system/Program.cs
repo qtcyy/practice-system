@@ -51,6 +51,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Add Bean
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProblemService, ProblemService>();
+builder.Services.AddScoped<IProblemEditService, ProblemEditService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
