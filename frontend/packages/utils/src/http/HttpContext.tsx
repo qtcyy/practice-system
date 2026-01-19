@@ -13,7 +13,11 @@ type HttpContextProviderProps = {
 };
 
 export const useHttp = () => {
-  return useContext(HttpContext);
+  const ctx = useContext(HttpContext);
+  if (!ctx) {
+    throw new Error('Http must use in Http Provider');
+  }
+  return ctx;
 };
 
 export const HttpContextProvider = (props: HttpContextProviderProps) => {

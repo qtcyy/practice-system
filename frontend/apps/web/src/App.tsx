@@ -6,6 +6,7 @@ import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes/routes';
 import { AuthInterceptor } from './interceptors';
 import { useAuthStore } from './stores/authStore';
+import { AuthProvider } from './context/AuthContext';
 
 const router = createHashRouter(routes);
 
@@ -19,7 +20,9 @@ const App = () => {
   return (
     <NiceModal.Provider>
       <HttpContextProvider fnInterceptors={[AuthInterceptor]}>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </HttpContextProvider>
     </NiceModal.Provider>
   );
