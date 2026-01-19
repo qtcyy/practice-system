@@ -6,7 +6,7 @@ namespace practice_system.Tests;
 
 public class RoleSeedTests
 {
-    private const string ConnectionString = "Server=localhost;Database=practice_system;User=root;Password=123456;";
+    private const string ConnectionString = "Server=1.117.233.43;Database=practice_system;User=practice_system;Password=DCNsE4PEMifCRY4Y;";
 
     private AppDbContext CreateDbContext()
     {

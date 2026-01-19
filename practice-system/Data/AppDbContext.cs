@@ -96,7 +96,7 @@ public class AppDbContext : DbContext
     {
         // 获取当前用户ID
         Guid? currentUserId = null;
-        var userIdClaim = _httpContextAccessor.HttpContext?.User
+        var userIdClaim = _httpContextAccessor?.HttpContext?.User
             .FindFirstValue(ClaimTypes.NameIdentifier);
         if (Guid.TryParse(userIdClaim, out var parsedUserId))
         {

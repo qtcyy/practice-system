@@ -53,6 +53,26 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProblemService, ProblemService>();
 builder.Services.AddScoped<IProblemEditService, ProblemEditService>();
 
+// Configure CORS
+builder.Services.Configure<CorsSettings>(builder.Configuration.GetSection("Cors"));
+var corsSettings = builder.Configuration.GetSection("Cors").Get<CorsSettings>()!;
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(corsSettings.AllowedOrigins)
+              .WithMethods(corsSettings.AllowedMethods)
+              .WithHeaders(corsSettings.AllowedHeaders)
+              .SetPreflightMaxAge(TimeSpan.FromHours(1));
+
+        if (corsSettings.AllowCredentials)
+        {
+            policy.AllowCredentials();
+        }
+    });
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -99,6 +119,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// CORS 必须在认证和异常处理之前，确保所有响应都包含 CORS 头
+app.UseCors("AllowFrontend");
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
