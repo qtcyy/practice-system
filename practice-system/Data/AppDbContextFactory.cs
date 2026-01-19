@@ -7,7 +7,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        var connectionString = "Server=localhost;Database=practice_system;User=root;Password=123456;";
+        var connectionString = "Server=1.117.233.43;Database=practice_system;User=practice_system;Password=DCNsE4PEMifCRY4Y;";
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
