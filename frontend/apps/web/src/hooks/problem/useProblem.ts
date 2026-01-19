@@ -96,6 +96,22 @@ type AddProblemResp = {
   results: any[];
 };
 
+type SubmitAnswerParam = {
+  problemId: string;
+  problemSetId?: string;
+  selectedResultIds?: string[];
+  textAnswer?: string;
+  status: number;
+  onSuccess?: (result: SubmitAnswerResp) => void;
+};
+
+type SubmitAnswerResp = {
+  message: string;
+  userAnswerId: string;
+  status: number;
+  answeredAt: string;
+};
+
 const useProblem = () => {
   // base
   const http = useHttp();
@@ -104,6 +120,7 @@ const useProblem = () => {
   const [initLoading, setInitLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const [problems, setProblems] = useState<ProblemDto[]>([]);
   const [problemDetail, setProblemDetail] = useState<ProblemDetailDto | null>(
@@ -114,6 +131,7 @@ const useProblem = () => {
   const loadProblems$Ref = useRef(new Subject<LoadProblemsParam>());
   const loadProblemDetail$Ref = useRef(new Subject<LoadProblemDetailParam>());
   const addProblem$Ref = useRef(new Subject<AddProblemParam>());
+  const submitAnswer$Ref = useRef(new Subject<SubmitAnswerParam>());
 
   // observer
   const loadProblemsObserver = useCallback(
@@ -143,6 +161,23 @@ const useProblem = () => {
       };
       return http.post<AddProblemResp>(
         getUrl('/api/Problem/add-problem'),
+        payload,
+      );
+    },
+    [http],
+  );
+
+  const submitAnswerObserver = useCallback(
+    (param: SubmitAnswerParam) => {
+      const payload = {
+        problemId: param.problemId,
+        problemSetId: param.problemSetId,
+        selectedResultIds: param.selectedResultIds,
+        textAnswer: param.textAnswer,
+        status: param.status,
+      };
+      return http.post<SubmitAnswerResp>(
+        getUrl('/api/Problem/submit-answer'),
         payload,
       );
     },
@@ -233,6 +268,30 @@ const useProblem = () => {
         error(err) {},
       });
 
+    // Submit answer
+    submitAnswer$Ref.current
+      .pipe(
+        takeUntil(destroy$),
+        tap(() => setSubmitLoading(true)),
+        debounceTime(200),
+        exhaustMap((params) =>
+          submitAnswerObserver(params).pipe(
+            tap({
+              next(value) {
+                setSubmitLoading(false);
+                params.onSuccess?.(value);
+              },
+              error(err) {
+                setSubmitLoading(false);
+              },
+            }),
+          ),
+        ),
+      )
+      .subscribe({
+        error(err) {},
+      });
+
     return () => {
       destroy$.next();
       destroy$.complete();
@@ -242,6 +301,7 @@ const useProblem = () => {
     loadProblemsObserver,
     loadProblemDetailObserver,
     addProblemObserver,
+    submitAnswerObserver,
   ]);
 
   // funcs
@@ -263,15 +323,21 @@ const useProblem = () => {
     addProblem$Ref.current.next(param);
   };
 
+  const submitAnswer = (param: SubmitAnswerParam) => {
+    submitAnswer$Ref.current.next(param);
+  };
+
   return {
     problems,
     problemDetail,
     initLoading,
     detailLoading,
     addLoading,
+    submitLoading,
     loadProblems,
     loadProblemDetail,
     addProblem,
+    submitAnswer,
   };
 };
 

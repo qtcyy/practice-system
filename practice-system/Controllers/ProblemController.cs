@@ -107,5 +107,34 @@ namespace practice_system.Controllers
 
             return Ok(resp);
         }
+
+        [HttpPost("submit-answer")]
+        public async Task<IActionResult> SubmitAnswer([FromBody] SubmitAnswerReq req, CancellationToken ct)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var userAnswer = await _problemEditService.SubmitAnswer(
+                userId,
+                req.ProblemId,
+                req.ProblemSetId,
+                req.SelectedResultIds,
+                req.TextAnswer,
+                req.Status,
+                ct
+            );
+
+            var resp = new SubmitAnswerResp(
+                "答案提交成功",
+                userAnswer.Id,
+                userAnswer.Status,
+                userAnswer.AnsweredAt
+            );
+
+            return Ok(resp);
+        }
     }
 }

@@ -13,5 +13,15 @@ namespace practice_system.Services.Problems
             List<ProblemResult> results,
             CancellationToken ct
         );
+
+        Task<UserAnswer> SubmitAnswer(
+            Guid userId,
+            Guid problemId,
+            Guid? problemSetId,
+            List<Guid>? selectedResultIds,
+            string? textAnswer,
+            ProblemStatus status,
+            CancellationToken ct
+        );
     }
 }

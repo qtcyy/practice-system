@@ -48,6 +48,10 @@ const routes: RouteObject[] = [
                 element: <ProblemDetail />,
               },
               {
+                path: 'practice/:setId',
+                element: <ProblemDetail />,
+              },
+              {
                 path: 'incorrect/:setId',
                 element: <IncorrectProblems />,
               },

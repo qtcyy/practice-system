@@ -49,4 +49,7 @@ namespace practice_system.Dtos
 
     public record AddProblemReq(Guid ProblemSetId, Problem Problem, List<ProblemResult> Results);
     public record AddProblemResp(string Message, Problem Problem, List<ProblemResult> Results);
+
+    public record SubmitAnswerReq(Guid ProblemId, Guid? ProblemSetId, List<Guid>? SelectedResultIds, string? TextAnswer, ProblemStatus Status);
+    public record SubmitAnswerResp(string Message, Guid UserAnswerId, ProblemStatus Status, DateTimeOffset AnsweredAt);
 }
