@@ -1,4 +1,13 @@
+import { useEffect } from 'react';
+import { useProblemSet } from 'src/hooks/problem-set/useProblemSet';
+
 const ProblemSets = () => {
+  const { loadProblemSets, initLoading, problemSets } = useProblemSet();
+
+  useEffect(() => {
+    loadProblemSets((data) => console.log(data));
+  }, []);
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">题集列表</h1>

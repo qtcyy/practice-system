@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { debounceTime, Subject, switchMap, tap } from 'rxjs';
 import { getUrl } from 'src/config/api';
 import { useAuthStore } from 'src/stores/authStore';
@@ -45,6 +46,7 @@ type LoginParam = {
 export const AuthProvider = ({ children }: Props) => {
   // base
   const http = useHttp();
+  const navigate = useNavigate();
 
   // state
   const [loginLoading, setLoginLoading] = useState(false);
@@ -122,7 +124,22 @@ export const AuthProvider = ({ children }: Props) => {
     login$Ref.current.next({ username, password, onSuccess });
   };
 
-  const _logout = (onSuccess?: () => void) => {};
+  const _logout = (onSuccess?: () => void) => {
+    // 调用 store 的 logout 方法
+    logout();
+
+    // 重定向到登录页
+    navigate('/login');
+
+    // 执行回调（如有）
+    onSuccess?.();
+
+    // 显示通知
+    Notification.info({
+      title: '已退出登录',
+      duration: 2,
+    });
+  };
 
   return (
     <AuthContext.Provider

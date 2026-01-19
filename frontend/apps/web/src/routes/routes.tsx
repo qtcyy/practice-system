@@ -1,5 +1,6 @@
 import type { RouteObject } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import RootLayout from '../components/RootLayout';
 import ProtectedRoute from './ProtectedRoute';
 import Layout from '../pages/layout/Layout';
 import Login from '../pages/login/Login';
@@ -13,47 +14,52 @@ import EditProblem from '../pages/edit-problem/EditProblem';
 
 const routes: RouteObject[] = [
   {
-    path: '/',
-    element: <Navigate to="/app" replace />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/register',
-    element: <Register />,
-  },
-  {
-    path: '/app',
-    element: <ProtectedRoute />,
+    element: <RootLayout />,
     children: [
       {
-        element: <Layout />,
+        path: '/',
+        element: <Navigate to="/app" replace />,
+      },
+      {
+        path: '/login',
+        element: <Login />,
+      },
+      {
+        path: '/register',
+        element: <Register />,
+      },
+      {
+        path: '/app',
+        element: <ProtectedRoute />,
         children: [
           {
-            index: true,
-            element: <ProblemSets />,
-          },
-          {
-            path: 'problem-set/:setId',
-            element: <ProblemList />,
-          },
-          {
-            path: 'problem/:problemId',
-            element: <ProblemDetail />,
-          },
-          {
-            path: 'incorrect/:setId',
-            element: <IncorrectProblems />,
-          },
-          {
-            path: 'create-set',
-            element: <CreateSet />,
-          },
-          {
-            path: 'edit-problem/:setId',
-            element: <EditProblem />,
+            element: <Layout />,
+            children: [
+              {
+                index: true,
+                element: <ProblemSets />,
+              },
+              {
+                path: 'problem-set/:setId',
+                element: <ProblemList />,
+              },
+              {
+                path: 'problem/:problemId',
+                element: <ProblemDetail />,
+              },
+              {
+                path: 'incorrect/:setId',
+                element: <IncorrectProblems />,
+              },
+              {
+                path: 'create-set',
+                element: <CreateSet />,
+              },
+              {
+                path: 'edit-problem/:setId',
+                element: <EditProblem />,
+              },
+            ],
           },
         ],
       },

@@ -1,29 +1,16 @@
-import { useEffect } from 'react';
-import { HttpContextProvider } from '@workspace/utils';
 import './App.css';
 import NiceModal from '@ebay/nice-modal-react';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes/routes';
-import { AuthInterceptor } from './interceptors';
-import { useAuthStore } from './stores/authStore';
-import { AuthProvider } from './context/AuthContext';
 
 const router = createHashRouter(routes);
 
 const App = () => {
-  const initAuth = useAuthStore((state) => state.initAuth);
-
-  useEffect(() => {
-    initAuth();
-  }, [initAuth]);
-
+  // Zustand persist 中间件会在 store 创建时自动恢复状态
+  // 所有 Provider 都移到了 RootLayout 组件中，位于 Router 内部
   return (
     <NiceModal.Provider>
-      <HttpContextProvider fnInterceptors={[AuthInterceptor]}>
-        <AuthProvider>
-          <RouterProvider router={router} />
-        </AuthProvider>
-      </HttpContextProvider>
+      <RouterProvider router={router} />
     </NiceModal.Provider>
   );
 };
