@@ -1,21 +1,16 @@
-import { Layout as SemiLayout } from '@douyinfe/semi-ui-19';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
-import Sider from './Sider';
-
-const { Content } = SemiLayout;
 
 const Layout = () => {
   return (
-    <SemiLayout className="h-screen">
+    <div className="flex flex-col h-screen">
       <Header />
-      <SemiLayout className="flex-1">
-        <Sider />
-        <Content className="p-6 overflow-auto bg-gray-50">
+      <main className="flex-1 overflow-auto bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           <Outlet />
-        </Content>
-      </SemiLayout>
-    </SemiLayout>
+        </div>
+      </main>
+    </div>
   );
 };
 
